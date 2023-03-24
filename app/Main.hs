@@ -1,38 +1,65 @@
 module Main (main) where
 import System.Environment
-import Data.Char (isDigit)
+import Data.Char ()
+
+import Text.Read (readMaybe)
 
 main :: IO ()
+-- *récupère les arguments et lance la function launch
 main = do
     list <- getArgs :: IO [String]
-    putStr(launch list)
+    launch list >>= putStr
 
-launch :: [String] -> String
+launch :: [String] -> IO String
+-- *lance la function image compressor en récupérant les arguments souhaité
 launch args = do
-    imageCompressor colorsNumber convergence path
+    imageCompressor n l f
     where
-        colorsNumber = getColor args "-n";
-        convergence = getConvergence args "-l";
-        path = getPath args "-f";
-
-imageCompressor :: Int -> Float -> String -> String
-imageCompressor 1 0.2 "ok" = "working"
-imageCompressor colorsNumber convergence path = path
+        n = readColorsNumber args
+        l = readConvergence args
+        f = readPath args
 
 
-getColor :: [String] -> String -> Int
-getColor [] _ = 84
-getColor (x:xs) name
-    | x == name && not (null xs)                                        =  read (head xs) :: Int
-    | otherwise                                                         = getColor  xs name
+imageCompressor :: Maybe Int -> Maybe Float -> Maybe String -> IO String
+-- *regarde si les arguments ne sont pas des nothing
+-- * et lance la function readFile
+imageCompressor Nothing _ _ = return "erreur"
+imageCompressor _ Nothing _ = return "erreur"
+imageCompressor _ _ Nothing = return "erreur"
+imageCompressor (Just n) (Just l) (Just f) = do
+    contents <- myReadFile (Just f)
+    case contents of
+        Just c -> return c
+        Nothing -> return "Le fichier n'a pas été trouvé."
 
-getConvergence :: [String] -> String -> Float
-getConvergence [] _ = 84
-getConvergence (x:xs) name
-    | x == name && not (null xs)                                        =  read (head xs) :: Float
-    | otherwise                                                         = getConvergence  xs name
+myReadFile :: Maybe String -> IO (Maybe String)
+-- * retourne le contenue du file graçe au path donné en arguments
+myReadFile Nothing = return Nothing
+myReadFile (Just path) = do
+    contents <- readFile path
+    return (Just contents)
 
-getPath :: [String] -> String -> String
-getPath (x:xs) name
-    | x == name && not (null xs)                                        =  read (head xs)
-    | otherwise                                                         = getPath  xs name
+
+getMyArgs :: Maybe [String] -> String -> Maybe String
+-- * récupère les arguments en comparant la string passé en paramètre
+getMyArgs Nothing _ = Nothing
+getMyArgs (Just []) _ = Nothing
+getMyArgs (Just (x:xs)) name
+    | x == name && not (null xs)    = Just (head xs)
+    | otherwise                     = getMyArgs (Just xs) name
+
+
+readColorsNumber :: [String] -> Maybe Int
+readColorsNumber args = do
+    arg <- getMyArgs (Just args) "-n"
+    readMaybe arg
+
+readConvergence :: [String] -> Maybe Float
+readConvergence args = do
+    arg <- getMyArgs (Just args) "-l"
+    readMaybe arg
+
+readPath :: [String] -> Maybe String
+readPath args = do
+    arg <- getMyArgs (Just args) "-f"
+    Just arg
