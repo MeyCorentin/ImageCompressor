@@ -1,7 +1,8 @@
 module Main (main) where
 import System.Environment
 import Data.Char ()
--- import System.Random
+import System.Random
+import Control.Monad (replicateM)
 
 import Text.Read (readMaybe)
 
@@ -30,7 +31,7 @@ imageCompressor _ _ Nothing = return "erreur"
 imageCompressor (Just n) (Just l) (Just f) = do
     contents <- myReadFile (Just f)
     case contents of
-        Just c -> return c -- ?(kmeans n l c)
+        Just c ->  (kmeans n l c)
         Nothing -> return "Le fichier n'a pas été trouvé."
 
 
@@ -71,26 +72,40 @@ readPath args = do
 
 -- ? [KMEANS algorithm] --
 
--- TODO : allocatePixel:: [[Int]] -> String -> [[Int, [String]]]
+-- TODO allocatePixel:: [IO [Int]] -> [String] -> [[IO [Int], [String]]]
 -- ! Prend  : un entrer une liste de centroide et le contenue du file
 -- ! Retourne : une liste contenant au début le centoide et a la fin les pixels lui appartenant
+-- allocatePixel centroides contents
 
--- TODO :  getRandomCentroide :: Int -> [[Int]]
--- ! Prend : le nombre de couleurs souhaités
--- ! Retourne : des couleurs sous le format [(int, int, int)] du nombre de couleurs
+rgbRandom :: IO [Int]
+-- * Retourne : un tripple de 3 int correspondant a des valeurs rgb
+-- ! IO [INT] car random donc effet de bord
+rgbRandom = replicateM 3 (randomRIO (1, 255))
 
--- TODO : kmeansLoop:: Float -> [[Int]] -> String -> String
-    -- kmeansLoop convergence oldCentroide contents = do
-    --     newCentroide -> centerCentroide (allocatePixel oldCentroide  contents)
-    --     if ( convergence >= calculConvergece newCentroide oldCentroide)
-    --         return (listToString (allocatePixel oldCentroide  contents))
-    --     else
-    --         kmeansLoop convergence newCentroide contents
+getRandomCentroide :: Int -> [IO [Int]]
+-- * Prend : le nombre de couleurs souhaités
+-- * Retourne : des couleurs sous le format [(int, int, int)] du nombre de couleurs
+getRandomCentroide 1 = [rgbRandom]
+getRandomCentroide colorsNumber = getRandomCentroide (colorsNumber - 1) ++ [rgbRandom]
+
+kmeansLoop:: Float -> [ IO [Int]] -> String -> IO String
+-- * Prend : la convergence souhaié, une liste de centroide et le contenue du file
+-- * Retourne : le résultat de l'algorithme jusqua la convergence souhaité
+kmeansLoop _ centroides _ = do 
+    results <- sequence centroides
+    return (show results)
+-- kmeansLoop convergence oldCentroide contents = do
+--     newCentroide -> centerCentroide (allocatePixel oldCentroide  (lines contents))
+--     if ( convergence >= calculConvergece newCentroide oldCentroide)
+--         return (listToString (allocatePixel oldCentroide  (lines contents)))
+--     else
+--         kmeansLoop convergence newCentroide contents
 
 
 -- TODO : listToString :: [[Int, [String]]] -> String
 -- ! Prend : le tableau contenant les centroides et les pixels qui leurs sont attribué
 -- ! Retourne : une chaine de charactère du format souhaité
+-- x! utiliser show et foldl
 
 -- TODO : calculConvergece:: [[Int]] -> [[Int]] -> Float
 -- ! Prend : les anciens et les nouveaux centroïde
@@ -100,7 +115,7 @@ readPath args = do
 -- ! Prend : les centroïdes et les pixels qui leurs sont attribués
 -- ! Retourne : les centroïdes centrés sur les pixels attribué 
 
--- TODO : kmeans :: Int -> Float -> String -> String
+kmeans :: Int -> Float -> String -> IO String
 -- * Prend : Un nombre de couleur une valeur de convergence et le path du file
 -- * Retourne : le résultat de la boucle le résultat de la boucle kmeansLoop
--- kmeans colors convergence contents = kmeansLoop convergence (getRandomCentroide colors) contents
+kmeans colors convergence contents = kmeansLoop convergence (getRandomCentroide colors) contents
