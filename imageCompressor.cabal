@@ -24,6 +24,10 @@ source-repository head
   location: https://github.com/githubuser/imageCompressor
 
 library
+  exposed-modules:
+      Display
+      Kmeans
+      Parser
   other-modules:
       Paths_imageCompressor
   hs-source-dirs:
