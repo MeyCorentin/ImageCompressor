@@ -1,6 +1,7 @@
 module Main (main) where
 
 import System.Environment
+import System.Exit
 import Parser (readColorsNumber, readConvergence, readPath, myReadFile)
 import Kmeans (kmeans)
 
@@ -19,9 +20,9 @@ launch args = do
         f = readPath args
 
 imageCompressor :: Maybe Int -> Maybe Double -> Maybe String -> IO String
-imageCompressor Nothing _ _ = return "erreur"
-imageCompressor _ Nothing _ = return "erreur"
-imageCompressor _ _ Nothing = return "erreur"
+imageCompressor Nothing _ _ = exitWith (ExitFailure 84)
+imageCompressor _ Nothing _ = exitWith (ExitFailure 84)
+imageCompressor _ _ Nothing = exitWith (ExitFailure 84)
 imageCompressor (Just n) (Just l) (Just f) = do
     contents <- myReadFile (Just f)
     case contents of
