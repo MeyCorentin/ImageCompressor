@@ -1,3 +1,10 @@
+--
+-- EPITECH PROJECT, 2023
+-- Main
+-- File description:
+-- Main
+--
+
 module Main (main) where
 
 import System.Environment
@@ -12,8 +19,7 @@ main = do
     putStrLn (result)
 
 launch :: [String] -> IO String
-launch args = do
-    imageCompressor n l f
+launch args = imageCompressor n l f
     where
         n = readColorsNumber args
         l = readConvergence args
@@ -28,3 +34,4 @@ imageCompressor (Just n) (Just l) (Just f) = do
     case contents of
         Just c ->  (kmeans n l c)
         Nothing -> return "Le fichier n'a pas été trouvé."
+
