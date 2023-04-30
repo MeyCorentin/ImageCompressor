@@ -1,9 +1,9 @@
---
+{-
 -- EPITECH PROJECT, 2023
 -- Main
 -- File description:
 -- Main
---
+-}
 
 module Main (main) where
 

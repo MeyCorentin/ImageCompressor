@@ -1,9 +1,9 @@
---
+{-
 -- EPITECH PROJECT, 2023
 -- Parser
 -- File description:
 -- Parser
---
+-}
 
 module Parser (readColorsNumber, readConvergence, readPath, myReadFile) where
 
