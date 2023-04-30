@@ -1,9 +1,9 @@
---
+{-
 -- EPITECH PROJECT, 2023
 -- Display
 -- File description:
 -- Display
---
+-}
 
 module Display (fromLineToRgb, printAssignments) where
 

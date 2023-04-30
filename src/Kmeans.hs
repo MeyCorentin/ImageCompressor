@@ -1,9 +1,9 @@
---
+{-
 -- EPITECH PROJECT, 2023
 -- Kmeans
 -- File description:
 -- Kmeans
---
+-}
 
 module Kmeans (kmeans) where
 
@@ -25,13 +25,13 @@ kmeans colors conv contents = do
     return (kmeansLoop conv centroides(map fromLineToRgb(lines contents)))
 
 kmeansLoop :: Double -> [Centroid] -> [Pixel] -> String
-kmeansLoop convergence oldCentroids pixels = do
+kmeansLoop convergence oldCentroids pixels =
     let assignCentroides = assignToNearest pixels oldCentroids
-    let newCentroids = centerCentroide assignCentroides
-    if all (\(old, new) -> distance old new >= convergence)
-        (zip oldCentroids newCentroids)
-        then kmeansLoop convergence newCentroids pixels
-        else printAssignments assignCentroides
+        newCentroids = centerCentroide assignCentroides
+    in if all (\(old, new) -> distance old new >= convergence)
+             (zip oldCentroids newCentroids)
+       then kmeansLoop convergence newCentroids pixels
+       else printAssignments assignCentroides
 
 assignToNearest :: [Pixel] -> [Centroid] -> [(Centroid, [Pixel])]
 assignToNearest pixels centroids =
